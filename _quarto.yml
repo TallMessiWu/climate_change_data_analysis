@@ -6,11 +6,11 @@ execute:
   echo: true
 
 book:
-  title: "YOUR PROJECT TITLE"
+  title: "Climate Change Data Analysis"
   author:
-    - AUTHOR1 (UNI1)
-    - AUTHOR2 (UNI2)
-  repo-url: https://github.com/YOUR_GITHUB_ACCOUNT/REPO_NAME
+    - Grant Kim (gk2636)
+    - Junlin Wu (jw4465)
+  repo-url: https://github.com/TallMessiWu/climate_change_data_analysis
   date: today
   page-footer:
     right: |
