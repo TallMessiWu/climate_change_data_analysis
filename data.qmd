@@ -33,3 +33,99 @@ For the datasheet, which is the primary data we will use to analyze, preliminary
 We further inspect the data sheet, which is most important for our research. Consistent Missing Values Across Years (1990-2010): Each year from 1990 to 2010 has exactly 3,495 missing values. Significant missing values are present in yearly data columns, ranging from 3,495 missing values per year (for most years) to 1,130 missing values for the year 2011. This pattern suggests a systematic issue with data collection or availability during this period. The number of missing values decreases to 1,130 in 2011, indicating an improvement in data collection. Some countries have consistent missing values across all years, which may indicate a lack of data reporting or collection for specific countries. For example, Afghanistan and Albania each have 15 missing values per year from 1990 to 2010 and 3 to 4 missing values in 2011. Different series (data types) also show varying levels of missing data. For example, the series "Annex-I emissions reduction target" consistently has 233 missing values each year from 1990 to 2010 and 190 missing values in 2011. This suggests that some data types are more consistently reported than others.
 
 Overall, the missing values appear to be influenced both by the type of data being reported (series) and the country reporting it. The consistency in missing values over the years and the reduction in 2011 are notable patterns. This information could be crucial for data cleaning, imputation strategies, or even for understanding the reliability of certain types of data within this data set.
+
+```{r}
+setwd("/Users/grantkim/FinalProj/data/raw")
+
+suppressWarnings({
+  library(readxl)
+data <- read_excel("sheet1.xls")
+})
+library(readr)
+library(dplyr)
+library(tidyr)
+library(ggplot2)
+
+# Assuming the data is already loaded into a data frame called `data`
+# And assuming '..' is used to represent missing values in your dataset
+
+# Replace '..' with actual NA values
+data <- data %>%
+  mutate(across(`1990`:`2011`, ~na_if(.x, "..")))
+
+# Calculate the percentage of missing values per year
+missing_data_percentage <- data %>%
+  select(`1990`:`2011`) %>%
+  summarise(across(everything(), 
+                   ~sum(is.na(.)) / n() * 100, # Calculate percentage
+                   .names = "perc_missing_{.col}")) # Rename the columns
+
+# Convert the data from wide to long format for plotting
+missing_data_long <- pivot_longer(missing_data_percentage, 
+                                  cols = starts_with("perc_missing_"), 
+                                  names_to = "Year", 
+                                  values_to = "PercentageMissing")
+
+# Extract the year from the column names for a cleaner x-axis
+missing_data_long$Year <- sub("perc_missing_", "", missing_data_long$Year)
+
+# Create the bar chart
+ggplot(missing_data_long, aes(x = Year, y = PercentageMissing)) +
+  geom_bar(stat = "identity", fill = "blue") +
+  theme_minimal() +
+  labs(
+    title = "Percentage of Missing Values by Year",
+    x = "Year",
+    y = "Percentage of Missing Values"
+  ) +
+  theme(axis.text.x = element_text(angle = 90, vjust = 0.5, hjust = 1)) # Rotate x-axis labels for readability
+
+```
+The bar chart titled "Percentage of Missing Values by Year" displays the proportion of missing data points in a dataset across different years, from 1990 to 2011.
+
+The most prominent trend is that more than 60% of our data is missing for all years. This is concerning for analysis. 
+From 1990 to around 1996, there is a slight downward trend in the percentage of missing values. 
+From 1996 to 2000, there is an increase in missing data, with some fluctuations. 
+After 2000, the percentage of missing values appears to stabilize somewhat, with slight ups and downs but no clear trend until 2007.
+There's a noticeable decrease in missing values in 2008, suggesting an improvement in data collection or recording for that year.
+In 2009, the percentage of missing values rises again before dropping in 2010.
+However, in 2011 there is a significant increase in missing data, indicating that the dataset's completeness took a substantial downturn in the most recent year shown.
+In the context of climate change or any other analysis relying on this data, the fluctuating levels of missing data could pose challenges. The years with higher percentages of missing values may lead to less reliable conclusions due to the lack of data. For robust analysis, it's crucial to account for these gaps, possibly through data imputation methods or by focusing on years with more complete data. The spike in missing data in 2011 is particularly concerning and would need to be addressed before any serious analysis of that year's data.
+
+```{r,  fig.width=12, fig.height=15}
+setwd("/Users/grantkim/FinalProj/data/raw")
+
+suppressWarnings({
+  library(readxl)
+data <- read_excel("sheet1.xls")
+})
+
+data <- data %>%
+  mutate(across(`1990`:`2011`, ~na_if(.x, "..")))
+
+# Calculate the percentage of missing values for each Series_name and Year
+missing_data_heatmap <- data %>%
+  select(-c(`Country code`, `Country name`, `Series code`, `SCALE`, `Decimals`)) %>%
+  pivot_longer(cols = `1990`:`2011`, names_to = "Year", values_to = "Value") %>%
+  mutate(is_missing = is.na(Value)) %>%
+  group_by(`Series name`, Year) %>%
+  summarise(PercentageMissing = sum(is_missing) / n() * 100) %>%
+  ungroup()
+
+# Create the heatmap
+ggplot(missing_data_heatmap, aes(x = Year, y = `Series name`, fill = PercentageMissing)) +
+  geom_tile() +
+  scale_fill_gradient(low = "white", high = "red") +
+  theme_minimal() +
+  labs(
+    title = "Heatmap of Missing Values by Series Name and Year",
+    x = "Year",
+    y = "Series Name",
+    fill = "Percentage Missing"
+  ) +
+  theme(axis.text.x = element_text(angle = 90, vjust = 0.5, hjust = 1)) # Rotate x-axis labels for readability
+
+
+```
+As you can see, we clear have very many series that have missing values over the years. We will drop a lot of these Series_name column in the preprocess.qmd. 
+

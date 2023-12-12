@@ -1,0 +1,119 @@
+---
+title: "Preprocess"
+format: html
+editor: visual
+---
+
+
+# Let's first proprocess and clean data 
+```{r}
+setwd("/Users/grantkim/FinalProj/data/raw")
+
+suppressWarnings({
+  library(readxl)
+data <- read_excel("sheet1.xls")
+})
+
+# Load the dplyr package
+library(dplyr)
+
+
+year_columns <- names(data)[5:28]  # Assuming year columns start from column 7 to 24
+
+options(scipen = 100)
+
+# Convert all year columns to numeric
+data <- data %>%
+  mutate(across(all_of(year_columns), as.numeric))
+
+# Assuming 'data' is your data frame
+data <- data %>%
+  mutate(across(all_of(year_columns), ~ round(., 2)))
+
+data <- data %>%
+  mutate(
+    
+    # Convert character columns to character data type
+    `Country code` = as.character(`Country code`),
+    `Country name` = as.character(`Country name`),
+    `Series code` = as.character(`Series code`),
+    `Series name` = as.character(`Series name`)
+  )
+
+data[data == '..'] <- NA
+
+names(data)[names(data) == "Country name"] <- "Country_name"
+names(data)[names(data) == "Series name"] <- "Series_name"
+names(data)[names(data) == "Country code"] <- "Country_code"
+
+```
+
+```{r}
+library(tidyverse)
+
+# Select only the 'Series name' and year columns for analysis
+data_simplified <- data[, c("Series_name", names(data)[5:ncol(data)])] # Adjust if needed
+
+# Convert data to a long format
+data_long <- pivot_longer(data_simplified, cols = -Series_name, names_to = "Year", values_to = "Value")
+
+# Create a new column to indicate missing values (1 if missing, 0 if not)
+data_long$IsMissing <- as.integer(is.na(data_long$Value))
+
+# Aggregate the data to count missing values for each 'Series name' and 'Year'
+missing_values_count_series <- data_long %>%
+                        group_by(Series_name, Year) %>%
+                        summarise(MissingCount = sum(IsMissing)) %>%
+                        ungroup()
+
+rows_with_more_than_117_missing <- which(missing_values_count_series$MissingCount > 117)
+rows_with_more_than_117_missing <- missing_values_count_series[rows_with_more_than_117_missing, ]
+rows_with_more_than_117_missing
+
+# Group by "Series name" and sum the MissingCount
+result <- rows_with_more_than_117_missing %>%
+  group_by(Series_name) %>%
+  summarise("Total Missing Count" = sum(MissingCount))
+
+# Print the aggregated result
+print(result)
+
+# Identify Series names with more than 2000 in Total Missing Count
+series_to_drop <- result %>%
+  filter(`Total Missing Count` > 2000) %>%
+  pull(Series_name)
+
+print(series_to_drop)
+```
+
+```{r}
+series_to_drop
+
+filtered_data <- data %>%
+  filter(!Series_name %in% series_to_drop)
+# Count unique "Series Name" values in filtered_data
+unique_series_count <- filtered_data %>%
+  summarise("Unique Series Name Count" = n_distinct(Series_name))
+
+```
+
+#merge sheet2 with current data to get other variables
+```{r}
+library(readr)
+sheet2 <- read_csv("/Users/grantkim/FinalProj/data/raw/sheet2.csv")
+sheet2 <- sheet2 %>% rename(Country_code = "Country code", Income_group = "Income group")
+#filtered_data <- filtered_data %>% rename(Country_code = "Country code")
+sheet2 <- sheet2 %>% select(Country_code, Income_group)
+
+
+# Merge the two dataframes based on the "Country_code" column
+merged_data <- merge(filtered_data, sheet2, by = "Country_code", all.x = TRUE)
+
+
+setwd("data/cleaned_and_ready")
+
+write.csv(merged_data, "data_cleaned.csv", row.names = FALSE)
+
+```
+
+```
