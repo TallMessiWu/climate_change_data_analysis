@@ -465,8 +465,8 @@ ggplot(plot_data, aes(x = `CO2 emissions per capita (metric tons)`, y = Income_g
   theme_ridges() +
   labs(x = "CO2 emissions per capita (metric tons)", y = "Income Group", fill = "Color", title = "Ridge Plot of CO2 Emissions per Capita by Income Group")
 ```
-It looks like the higher the income, the higher CO2 emissions per capita. This is consistent with our previous analysis. However, we can see that the spread of CO2 emissions per capita is much wider for high income countries than low income countries. This means that some high income countries' economic growth is probably not sustainable. In addition, we can see that between high income OECD and high income nonOECD, high income nonOECD has a much wider spread and average higher CO2 emissions per capita. Moreover, we can see a small peak in the right tail of high income nonOECD, which means that there are some high income nonOECD countries that have very high CO2 emissions per capita. I will further analyze these countries.
 
+It looks like the higher the income, the higher CO2 emissions per capita. This is consistent with our previous analysis. However, we can see that the spread of CO2 emissions per capita is much wider for high income countries than low income countries. This means that some high income countries' economic growth is probably not sustainable. In addition, we can see that between high income OECD and high income nonOECD, high income nonOECD has a much wider spread and average higher CO2 emissions per capita. Moreover, we can see a small peak in the right tail of high income nonOECD, which means that there are some high income nonOECD countries that have very high CO2 emissions per capita. I will further analyze these countries.
 
 ```{r fig.width=15, fig.height=10}
 # draw scatterplots of CO2 emissions per capita vs. Energy use per capita for high income nonOECD countries
@@ -484,8 +484,8 @@ wide_data %>%
   labs(x = "Energy use per capita (kilograms of oil equivalent)", y = "CO2 emissions per capita (metric tons)", color = "Color", title = "Scatterplot of CO2 Emissions per Capita vs. Energy Use per Capita for High Income nonOECD Countries")
 ```
 
+Looks like that peak we saw in the Ridge plot is actually caused by just one country.
 
-Looks like that peak we saw in the Ridge plot is actually caused by just one country. 
 ```{r}
 # find out which country has is the country that has the higher than 40 CO2 emissions per capita
 wide_data %>%
@@ -494,6 +494,7 @@ wide_data %>%
   select(Country_name)
 
 ```
+
 The country is Qatar. Qatar has high CO2 emission per captita and it also stands out in energy use per capita. This makes sense as Qatar is a country that mainly relies on selling natural gas and oil. In addition, it has a relatively small population, driving up the CO2 emissions per capita. In order to excavate the natural gas and oil, Qatar needs to use a lot of energy, which explains why it has a high energy use per capita.
 
 # 3.9 Scatterplot of CO2 Emissions per Capita vs. Energy Use per Capita
@@ -513,6 +514,7 @@ wide_data %>%
   ) +
   labs(x = "Energy use per capita (kilograms of oil equivalent)", y = "CO2 emissions per capita (metric tons)", color = "Color", title = "Scatterplot of CO2 Emissions per Capita vs. Energy Use per Capita")
 ```
+
 We can see that generally, the higher the energy use per capita, the higher the CO2 emissions per capita. This is probably because for many countries, the main sources of energies still emites CO2 at a very high rate. Thus, the more energy a country uses, the more CO2 it emits. However, we can see that there are some countries that have a high energy use per capita but a relatively low CO2 emissions per capita. This is most likely because these countries use renewable energy sources such as solar, wind, or hydroelectric power. I will further analyze the relationship between CO2 emissions and other energy sources in the interactive plot.
 
 ```{r}

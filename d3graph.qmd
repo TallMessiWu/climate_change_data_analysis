@@ -13,11 +13,9 @@
 </style>
 
 <div id="plot">
-    <div id="scatterplot"></div>
-    <div id="barplot">
-    </div>
 </div>
-
+<div>
+You can hover the mouse over the data points to see the exact values. In addition, a barplot will be shown when you hover over that data point.
+</div>
 <script src="https://cdn.jsdelivr.net/npm/d3@7"></script>
 <script src="scripts/myscript.js"></script>
-

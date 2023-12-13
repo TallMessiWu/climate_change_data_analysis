@@ -60,6 +60,6 @@
     "href": "d3graph.html",
     "title": "4  Interactive graph",
     "section": "",
-    "text": "&lt;div id=\"scatterplot\"&gt;&lt;/div&gt;\n&lt;div id=\"barplot\"&gt;\n&lt;/div&gt;"
+    "text": "You can hover the mouse over the data points to see the exact values. In addition, a barplot will be shown when you hover over that data point."
   }
 ]

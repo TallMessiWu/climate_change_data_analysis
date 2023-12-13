@@ -1,5 +1,8 @@
+d3.select("#plot").append("div").attr("id", "scatterplot");
+d3.select("#plot").append("div").attr("id", "barplot");
+
 async function drawGraph() {
-    data = await d3.csv("data/cleaned_and_ready/wide_data.csv");
+    data = await d3.csv("https://raw.githubusercontent.com/TallMessiWu/climate_change_data_analysis/main/data/cleaned_and_ready/wide_data.csv");
 
     // get rid of the index and color column
     data = data.map(d => {
@@ -45,7 +48,6 @@ async function drawGraph() {
 
     let min_z_score = d3.min(z_scores);
     let max_z_score = d3.max(z_scores);
-    console.log(min_z_score, max_z_score)
 
     let columns = Object.keys(data[0]);
     columns = columns.filter(d => d !== "Country_name" && d !== "Income_group" && d !== "CO2 emissions per capita (metric tons)" && d !== "Energy use per capita (kilograms of oil equivalent)")
@@ -71,7 +73,7 @@ async function drawGraph() {
 
     // draw scatter plot
     // canvas
-    let width = 750;
+    let width = 650;
     let height = 650;
     let margin = {top: 20, right: 20, bottom: 70, left: 70};
 
@@ -143,16 +145,6 @@ async function drawGraph() {
         .attr("transform", "rotate(-90)")
         .text("Energy use per capita (kilograms of oil equivalent)")
 
-    // tooltip
-    d3.select("#scatterplot").append("div")
-        .attr("id", "tooltip")
-        .style("position", "absolute")
-        .style("background-color", "white")
-        .style("border", "solid")
-        .style("padding-left", "10px")
-        .style("padding-right", "10px")
-        .style("opacity", 0);
-
     // add an empty barplot for now
     d3.select("#barplot").append("svg")
         .attr("width", width)
@@ -173,9 +165,18 @@ async function drawGraph() {
                 .attr("r", 10)
                 .attr("opacity", 1)
 
+            // create tooltip
+            d3.select("#scatterplot").append("div")
+                .attr("id", "tooltip")
+                .style("position", "absolute")
+                .style("z-index", "10")
+                .style("background-color", "white")
+                .style("border", "solid")
+                .style("padding-left", "10px")
+                .style("padding-right", "10px")
+
             // configure hover tooltip
             d3.select("#tooltip")
-                .style("opacity", 1)
                 .html(`<p>Country: ${d.country_name}</p>
                             <p>Energy use capita: ${d.energy_use}</p>
                           <p>CO2 emissions per capita: ${d.CO2_emissions}</p>`)
@@ -191,9 +192,8 @@ async function drawGraph() {
             d3.select(this)
                 .attr("r", 5)
                 .attr("opacity", 0.5)
-            // hide tooltip
-            d3.select("#tooltip")
-                .style("opacity", 0)
+            // remove tooltip
+            d3.select("#tooltip").remove()
         })
 }
 
@@ -234,9 +234,9 @@ function drawBarplot(data, min_z_score, max_z_score, columns) {
     })
 
     // canvas
-    let width = 750;
+    let width = 650;
     let height = 650;
-    let margin = {top: 20, right: 100, bottom: 200, left: 70};
+    let margin = {top: 80, right: 100, bottom: 200, left: 70};
 
     const plot = d3.select("#barplot").append("svg")
         .attr("width", width)
@@ -279,6 +279,13 @@ function drawBarplot(data, min_z_score, max_z_score, columns) {
         .attr("fill", colorScale(income_group))
         .attr("width", xScale.bandwidth())
         .attr("height", d => height - margin.bottom - yScale(d[1]))
+
+    // add title
+    plot.append("text")
+        .attr("x", width / 2 - 110)
+        .attr("y", margin.top - 10)
+        .text(`Country: ${country_name}`)
+
 }
 
 drawGraph();
