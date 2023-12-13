@@ -35,11 +35,9 @@ We further inspect the data sheet, which is most important for our research. Con
 Overall, the missing values appear to be influenced both by the type of data being reported (series) and the country reporting it. The consistency in missing values over the years and the reduction in 2011 are notable patterns. This information could be crucial for data cleaning, imputation strategies, or even for understanding the reliability of certain types of data within this data set.
 
 ```{r}
-setwd("/Users/grantkim/FinalProj/data/raw")
-
 suppressWarnings({
   library(readxl)
-data <- read_excel("sheet1.xls")
+data <- read_excel("data/raw/sheet1.xls")
 })
 library(readr)
 library(dplyr)
@@ -93,11 +91,9 @@ However, in 2011 there is a significant increase in missing data, indicating tha
 In the context of climate change or any other analysis relying on this data, the fluctuating levels of missing data could pose challenges. The years with higher percentages of missing values may lead to less reliable conclusions due to the lack of data. For robust analysis, it's crucial to account for these gaps, possibly through data imputation methods or by focusing on years with more complete data. The spike in missing data in 2011 is particularly concerning and would need to be addressed before any serious analysis of that year's data.
 
 ```{r,  fig.width=12, fig.height=15}
-setwd("/Users/grantkim/FinalProj/data/raw")
-
 suppressWarnings({
   library(readxl)
-data <- read_excel("sheet1.xls")
+data <- read_excel("data/raw/sheet1.xls")
 })
 
 data <- data %>%
