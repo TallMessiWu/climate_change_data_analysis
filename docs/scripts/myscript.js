@@ -30,7 +30,7 @@ async function drawGraph() {
     data = data.map(d => {
         for (const [key, value] of Object.entries(d)) {
             if (key !== "Country_name" && key !== "Income_group" && key !== "CO2 emissions per capita (metric tons)" && key !== "Energy use per capita (kilograms of oil equivalent)") {
-               let z_score = (value - d3.mean(data, d => d[key])) / d3.deviation(data, d => d[key]);
+                let z_score = (value - d3.mean(data, d => d[key])) / d3.deviation(data, d => d[key]);
                 d[key] = Math.round(z_score * 100) / 100;
             }
         }
@@ -279,6 +279,7 @@ function drawBarplot(data, min_z_score, max_z_score, columns) {
         .attr("fill", colorScale(income_group))
         .attr("width", xScale.bandwidth())
         .attr("height", d => height - margin.bottom - yScale(d[1]))
+
 
     // add title
     plot.append("text")
